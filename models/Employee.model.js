@@ -8,13 +8,21 @@ const optionsString = {
 
 const optionsNumber = {
     type: Number,
-    required: true
+    required: true,
+    default: 0
+}
+
+const optionsEnumType = {
+    type: String,
+    required: true,
+    enum: ['free', 'busy'],
+    default: 'free'
 }
 
 const EmployeeModel = new Schema({
     name: optionsString,
     stars: optionsNumber,
-    currentOrder: optionsString
+    currentOrder: optionsEnumType
 })
 
 module.exports = mongoose.model('Employee', EmployeeModel);

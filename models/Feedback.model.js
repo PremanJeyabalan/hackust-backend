@@ -11,10 +11,10 @@ const optionsNumber = {
     required: true
 }
 
-const LocationModel = new Schema({
-    latitude: optionsNumber,
-    longtitude: optionsNumber
+const FeedbackModel = Schema({
+    customerId: optionsString,
+    target: optionsString,
+    stars: optionsNumber
 })
 
-
-module.exports = mongoose.model('Location', LocationModel);
+module.exports = mongoose.model('Feedback', FeedbackModel);

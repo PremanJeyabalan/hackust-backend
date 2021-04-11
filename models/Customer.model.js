@@ -6,6 +6,13 @@ const optionsString = {
     required: true
 }
 
+const optionsEnumType = {
+    type: String,
+    required: true,
+    enum: ['approved', 'active', 'inactive'],
+    default: 'inactive'
+}
+
 const optionsNumber = {
     type: Number,
     required: true
@@ -13,7 +20,7 @@ const optionsNumber = {
 
 const CustomerModel = new Schema({
     name: optionsString,
-    currentOrder: optionsString
+    status: optionsEnumType
 })
 
 

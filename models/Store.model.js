@@ -8,12 +8,15 @@ const optionsString = {
 
 const optionsNumber = {
     type: Number,
-    required: true
+    required: true,
+    default: 0
 }
 
 const StoreModel = new Schema({
     name: optionsString,
     stars: optionsNumber,
+    latitude: { required: true, type: Number},
+    longitude: { required: true, type: Number}
 })
 
 
