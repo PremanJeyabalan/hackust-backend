@@ -9,7 +9,7 @@ const optionsString = {
 const optionsEnumType = {
     type: String,
     required: true,
-    enum: ['approved', 'active', 'inactive'],
+    enum: ['accepted', 'active', 'inactive'],
     default: 'inactive'
 }
 

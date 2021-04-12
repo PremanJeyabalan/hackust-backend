@@ -1,12 +1,14 @@
 const mongoose = require('mongoose')
-const { MongoURL, MongoDBName } = require('../config')
-const Order = require('../models/Order.model');
+const axios = require('axios');
+const { MongoURL, MongoDBName, algoMicroserviceURL } = require('../config')
+const CustomerOrder = require('../models/CustomerOrder.model');
+const EmployeeOrder = require('../models/EmployeeOrder.model');
 const Customer = require('../models/Customer.model');
 const Item = require('../models/Item.model');
 const Store = require('../models/Store.model');
 const FeedbackModel = require('../models/Feedback.model');
 
-async function createOrder(data) {
+async function createOrder(data, Model) {
     try {
 
         await mongoose.connect(MongoURL, {
@@ -15,7 +17,7 @@ async function createOrder(data) {
             dbName: MongoDBName 
         })
 
-        const order = new Order({...data});
+        const order = new Model({...data});
 
         const result = await order.save().then(doc => {return doc})
 
@@ -88,7 +90,7 @@ async function getAllItems() {
     }
 }
 
-async function acceptOrder(orderId, employeeId) {
+async function acceptOrder(employeeOrderId, employeeId) {
     try {
 
         await mongoose.connect(MongoURL, {
@@ -97,7 +99,7 @@ async function acceptOrder(orderId, employeeId) {
             dbName: MongoDBName 
         })
 
-        const result = await Order.findByIdAndUpdate(orderId, {$set: {employeeId, status: 'accepted'}});
+        const result = await EmployeeOrder.findByIdAndUpdate(employeeOrderId, {$set: {employeeId, status: 'accepted'}});
 
         await mongoose.connection.close();
 
@@ -116,7 +118,7 @@ async function getOrder(orderId) {
             dbName: MongoDBName 
         })
 
-        const result = await Order.findById(orderId);
+        const result = await CustomerOrder.findById(orderId);
         
         await mongoose.connection.close();
 
@@ -136,7 +138,7 @@ async function addPrice(employeeList, orderId){
         const order = await getOrder(orderId);
 
         const empList = {...order.employeeList, employeeList};
-        const result = await Order.findByIdAndDelete(orderId, {$set: {employeeList: empList}});
+        const result = await CustomerOrder.findByIdAndDelete(orderId, {$set: {employeeList: empList}});
 
         await mongoose.connection.close();
 
@@ -146,7 +148,7 @@ async function addPrice(employeeList, orderId){
     }
 }
 
-async function getAvailableOrders() {
+async function getAvailableOrder() {
     try {
         await mongoose.connect(MongoURL, {
             useUnifiedTopology: true,   
@@ -154,11 +156,11 @@ async function getAvailableOrders() {
             dbName: MongoDBName 
         })
 
-        const orders = await Order.find({status: 'active'});
-
+        const result = await EmployeeOrder.find({status: 'created'}).sort({id: 1}).limit(1);
+        
         await mongoose.connection.close();
 
-        return orders;
+        return result;
     } catch {
         throw e;
     }
@@ -249,6 +251,26 @@ async function updateStars({ id, Model }){
     }
 }
 
+async function getAllActiveOrdersDistrict(district){
+    try {
+        await mongoose.connect(MongoURL, {
+            useUnifiedTopology: true,   
+            useNewUrlParser: true,
+            dbName: MongoDBName 
+        })
+
+        const result = await CustomerOrder.find({status: 'active', district}).sort({ _id: 1 }).limit(3);
+
+        await mongoose.connection.close();
+
+        return result
+    } catch (e) {
+        throw e;
+    }
+}
+
+
+
 module.exports = {
     createOrder,
     updateStatus,
@@ -257,9 +279,10 @@ module.exports = {
     acceptOrder,
     getOrder,
     addPrice,
-    getAvailableOrders,
+    getAvailableOrder,
     createPerson,
     createStore,
     createFeedback,
-    updateStars
+    updateStars,
+    getAllActiveOrdersDistrict
 }

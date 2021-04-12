@@ -14,24 +14,21 @@ const optionsNumber = {
 const optionsEnumType = {
     type: String,
     required: true,
-    enum: ['solved', 'active', 'accepted'],
-    default: 'active'
+    enum: ['created', 'batched', 'accepted', 'solved'],
+    default: 'created'
 }
 
-const OrderModel = new Schema({
+const CustomerOrderModel = new Schema({
     customerId: optionsString,
-    employeeId: {...optionsString, required: false},
-    latitude: { required: true, type: Number},
-    longitude: { required: true, type: Number},
+    district: optionsString,
     employeeTargetPrice: {...optionsNumber, required: false},
     customerPrice: optionsNumber,
     customerList: [new Schema({}, {strict: false})],
-    employeeList: [new Schema({}, {strict: false})],
     status: optionsEnumType,
 }, {timestamps: true})
 
 
-module.exports = mongoose.model('Order', OrderModel);
+module.exports = mongoose.model('CustomerOrder', CustomerOrderModel);
 
 /*
 customerList schema:

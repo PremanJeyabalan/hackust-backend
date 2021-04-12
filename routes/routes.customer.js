@@ -1,31 +1,51 @@
 const Express = require('express');
 const bodyParser = require('body-parser');
-const { createOrder, updateStatus, getAllItems } = require('../helpers/mongo');
+const { createOrder, updateStatus, getAllItems, getAllActiveOrdersDistrict } = require('../helpers/mongo');
+const { getTargetAndCustomerPrice } = require('../helpers/microservice');
 const Customer = require('../models/Customer.model');
-const Employee = require('../models/Employee.model');
+const CustomerOrder = require('../models/CustomerOrder.model');
+const EmployeeOrder = require('../models/EmployeeOrder.model');
+const { uniq } = require('lodash');
 let app = Express.Router();
+const catObject = {fruit : 0, veg: 1, poul: 2, dairy: 3, seafood: 4, cereals: 5, beverages: 6 } ;
 
-app.use(bodyParser.json());
+app.use(Express.json());
 
 app.post('/create', async (req, res) => {
-    const {customerId, latitude, longitude, customerList} = req.body;
+    const {customerId, district, customerList} = req.body;
 
     try {
         const itemList = await getAllItems();
         const nameArray = customerList.map(item => {
             return item.name;
         });
-        // const {employeeTargetPrice, customerPrice} = await callCheeseAlgo({nameArray, itemList})
-        console.log(customerList);
-        console.log(nameArray);
 
-        //temp
-        const customerPrice = 10;
-        //
-
-        const order = await createOrder({customerId, latitude, longitude, customerList, customerPrice});
+        const order = await createOrder({customerId, district, customerList, customerPrice}, CustomerOrder);
         await updateStatus({status: 'active', id: customerId, Model: Customer});
-            
+
+        let categories = [[],[],[],[],[],[],[]];
+        const orders = await getAllActiveOrdersDistrict(district);
+        if (orders.length == 3){
+            for (let i of orders) {
+                for (let j in i.customerList){
+                    categories[j.category].push({...j, orderId: i._id});
+                }
+            }
+
+            for (let i of categories) {
+                if (i.length > 0) {
+                    // const employeeTargetPrice = await getTargetAndCustomerPrice({ itemList, nameArray: i});
+                    const batchOrderIds = Array();
+                    for (let j of i){
+                        batchOrderIds.push(j.orderId);
+                    }
+
+                    batchOrderIds = uniq(batchOrderIds);
+                    await createOrder({district, employeeTargetPrice, batchOrderIds}, EmployeeOrder);
+                }
+            }
+
+        }     
 
         res.status(200).json({
             success: true,
@@ -44,3 +64,14 @@ module.exports = app;
 
 
 console.log("balls") //DO NOT DELETE
+
+
+/*
+    [
+        {
+            name
+            employeePrice
+            customerPrice
+        }
+    ] 
+*/
