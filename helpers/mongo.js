@@ -15,7 +15,7 @@ async function createOrder(data) {
             dbName: MongoDBName 
         })
 
-        const order = Order.save({...data});
+        const order = new Order({...data});
 
         const result = await order.save().then(doc => {return doc})
 
@@ -172,8 +172,11 @@ async function createPerson(name, Model) {
             dbName: MongoDBName 
         })
 
-        const person = Model({...name});
-        const result = await person.save().then(doc => {return doc});
+        console.log(name, "is here!");
+
+        const person = Model({name : name});
+        console.log("model made")
+        const result = await person.save().then(doc => {return doc}).catch(err => console.log(err));
 
         await mongoose.connection.close();
 

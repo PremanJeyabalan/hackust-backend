@@ -2,9 +2,10 @@ const Express = require('express');
 const { createPerson, createStore } = require('../helpers/mongo');
 const Customer = require('../models/Customer.model');
 const Employee = require('../models/Employee.model');
-let app = Express();
+let app = Express.Router();
 
 app.post('/create/employee', async (req, res) => {
+    console.log(req.body);
     const {name} = req.body;
 
     try {
