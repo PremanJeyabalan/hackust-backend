@@ -5,7 +5,7 @@ const Employee = require('../models/Employee.model');
 let app = Express();
 
 app.post('/create', async (req, res) => {
-    const {customerId, location, customerList} = req.body;
+    const {customerId, latitude, longitude, customerList} = req.body;
 
     try {
         const itemList = await getAllItems();
@@ -15,7 +15,7 @@ app.post('/create', async (req, res) => {
         // const {employeeTargetPrice, customerPrice} = await callCheeseAlgo({nameArray, itemList})
         
 
-        const order = await createOrder({customer, latitude, longitude, customerList});
+        const order = await createOrder({customerId, latitude, longitude, customerList});
         await updateStatus({status: 'active', id: customer, Model: Customer});
         
 
