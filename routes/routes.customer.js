@@ -12,21 +12,22 @@ const catObject = {fruit : 0, veg: 1, poul: 2, dairy: 3, seafood: 4, cereals: 5,
 
 app.use(Express.json());
 
-app.post('/create', async (req, res) => {
+app.post('/order/create', async (req, res) => {
     const {customerId, district, customerList} = req.body;
 
     try {
         const itemList = await getAllItems();
 
-        const order = await createOrder({customerId, district, customerList, customerPrice}, CustomerOrder);
+        const order = await createOrder({customerId, district, customerList}, CustomerOrder);
         await updateStatus({status: 'active', id: customerId, Model: Customer});
 
         let categories = [[],[],[],[],[],[],[]];
         let batchOrderIds = [[],[],[],[],[],[],[]];
         const orders = await getAllActiveOrdersDistrict(district);
+        // console.log(orders);
         if (orders.length == 3){
             for (let i of orders) {
-                for (let j in i.customerList){
+                for (let j of i.customerList){
                     categories[catObject[j.category]].push(j);
                     batchOrderIds[catObject[j.category]].push(i._id);
                 }

@@ -15,8 +15,7 @@ const optionsNumber = {
 const StoreModel = new Schema({
     name: optionsString,
     stars: optionsNumber,
-    latitude: { required: true, type: Number},
-    longitude: { required: true, type: Number}
+    district: optionsString
 })
 
 

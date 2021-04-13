@@ -188,7 +188,7 @@ async function createPerson(name, Model) {
     }
 }
 
-async function createStore({name, latitude, longitude}) {
+async function createStore({name, district}) {
     try {
         await mongoose.connect(MongoURL, {
             useUnifiedTopology: true,   
@@ -196,7 +196,7 @@ async function createStore({name, latitude, longitude}) {
             dbName: MongoDBName 
         })
 
-        const store = Store({name, latitude, longitude});
+        const store = Store({name, district});
         const result = await store.save().then(doc => {return doc});
 
         await mongoose.connection.close();
@@ -255,11 +255,11 @@ async function getAllActiveOrdersDistrict(district){
     try {
         await mongoose.connect(MongoURL, {
             useUnifiedTopology: true,   
-            useNewUrlParser: true,
+            useNewUrlParser: true,  
             dbName: MongoDBName 
         })
 
-        const result = await CustomerOrder.find({status: 'active', district}).sort({ _id: 1 }).limit(3);
+        const result = await CustomerOrder.find({status: 'created', district}).sort({ _id: 1 }).limit(3);
 
         await mongoose.connection.close();
 

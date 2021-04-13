@@ -43,10 +43,10 @@ app.post('/create/customer', async (req, res) => {
 })
 
 app.post('/create/store', async (req, res) => {
-    const { name, latitude, longitude } = req.body;
+    const { name, district } = req.body;
 
     try {
-        const store = await createStore({name, latitude, longitude});
+        const store = await createStore({name, district });
 
         res.status(200).json({
             success: true,

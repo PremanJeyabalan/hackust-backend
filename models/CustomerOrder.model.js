@@ -22,7 +22,7 @@ const CustomerOrderModel = new Schema({
     customerId: optionsString,
     district: optionsString,
     employeeTargetPrice: {...optionsNumber, required: false},
-    customerPrice: optionsNumber,
+    customerPrice: {...optionsNumber, required: false},
     customerList: [new Schema({}, {strict: false})],
     status: optionsEnumType,
 }, {timestamps: true})
