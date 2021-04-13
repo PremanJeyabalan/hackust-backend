@@ -18,13 +18,20 @@ const optionsEnumType = {
     default: 'discrete'
 }
 
+const optionsCategoryType = {
+    type: String,
+    required: true,
+    enum: ['fruit', 'veg', 'poul', 'dairy', 'seafood', 'cereals', 'beverages']
+}
+
 const ItemModel = new Schema({
     name: optionsString,
-    stars: optionsNumber,
     amount: optionsNumber,
-    store: optionsString,
+    type: optionsEnumType,
     price: optionsNumber,
-    type: optionsEnumType
+    category: optionsCategoryType,
+    employeeId: optionsString,
+    storeId: optionsString
 }, {timestamps: true})
 
 

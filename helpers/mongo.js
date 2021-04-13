@@ -7,6 +7,8 @@ const Customer = require('../models/Customer.model');
 const Item = require('../models/Item.model');
 const Store = require('../models/Store.model');
 const FeedbackModel = require('../models/Feedback.model');
+const { result } = require('lodash');
+const { findOneAndUpdate } = require('../models/CustomerOrder.model');
 
 async function createOrder(data, Model) {
     try {
@@ -49,7 +51,7 @@ async function updateStatus({status, id, Model}) {
     }
 }
 
-async function createItems(customerList) {
+async function createItems(employeeList) {
     try {
         await mongoose.connect(MongoURL, {
             useUnifiedTopology: true,   
@@ -58,7 +60,7 @@ async function createItems(customerList) {
         })
         const result = Array();
 
-        for (let item of customerList) {
+        for (let item of employeeList) {
             const doc = Item({...item});
             result.push(await doc.save().then(doc => {return doc})); 
         }
@@ -128,17 +130,15 @@ async function getOrder(orderId) {
     }
 }
 
-async function addPrice(employeeList, orderId){
+async function updateEmployeeList(employeeList, employeeOrderId){
     try {
         await mongoose.connect(MongoURL, {
             useUnifiedTopology: true,   
             useNewUrlParser: true,
             dbName: MongoDBName 
         })
-        const order = await getOrder(orderId);
-
-        const empList = {...order.employeeList, employeeList};
-        const result = await CustomerOrder.findByIdAndDelete(orderId, {$set: {employeeList: empList}});
+        
+        const result = await EmployeeOrder.findByIdAndUpdate(employeeOrderId, {$set: {employeeList}});
 
         await mongoose.connection.close();
 
@@ -157,7 +157,7 @@ async function getAvailableOrder() {
         })
 
         const result = await EmployeeOrder.find({status: 'created'}).sort({id: 1}).limit(1);
-        
+
         await mongoose.connection.close();
 
         return result;
@@ -269,6 +269,56 @@ async function getAllActiveOrdersDistrict(district){
     }
 }
 
+async function updateEmployeeOrder(id, update){
+    try {
+        await mongoose.connect(MongoURL, {
+            useUnifiedTopology: true,   
+            useNewUrlParser: true,
+            dbName: MongoDBName 
+        })
+
+        const result = await EmployeeOrder.findByIdAndUpdate(id, {$set: update});
+
+        await mongoose.connection.close();
+
+        return result
+    } catch (e) {
+        throw e
+    }
+}
+
+async function solveCustomerOrder(batchOrderId){
+    try {
+        await mongoose.connect(MongoURL, {
+            useUnifiedTopology: true,   
+            useNewUrlParser: true,
+            dbName: MongoDBName 
+        })
+
+        const result = await EmployeeOrder.find({batchOrderId});
+        let status = true;
+
+        for (order of result){
+            if (order.status !== 'solved'){
+                status = false;
+                break;
+            }
+        }
+
+        if (status) {
+            await updateStatus({status: 'solved', id: batchOrderId, Model: CustomerOrder});
+            const order = await getOrder(batchOrderId);
+            await updateStatus({status: 'inactive', id: order.customerId, Model: Customer});
+        }
+
+        await mongoose.connection.close();
+
+        return result
+    } catch (e) {
+        throw e
+    }
+}
+
 
 
 module.exports = {
@@ -278,11 +328,13 @@ module.exports = {
     getAllItems,
     acceptOrder,
     getOrder,
-    addPrice,
+    updateEmployeeList,
     getAvailableOrder,
     createPerson,
     createStore,
     createFeedback,
     updateStars,
-    getAllActiveOrdersDistrict
+    getAllActiveOrdersDistrict,
+    updateEmployeeOrder,
+    solveCustomerOrder,
 }

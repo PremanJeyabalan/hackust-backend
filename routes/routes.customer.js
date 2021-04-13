@@ -6,6 +6,7 @@ const Customer = require('../models/Customer.model');
 const CustomerOrder = require('../models/CustomerOrder.model');
 const EmployeeOrder = require('../models/EmployeeOrder.model');
 const { uniq } = require('lodash');
+const { createBatch } = require('../helpers/batch');
 let app = Express.Router();
 const catObject = {fruit : 0, veg: 1, poul: 2, dairy: 3, seafood: 4, cereals: 5, beverages: 6 } ;
 
@@ -16,32 +17,34 @@ app.post('/create', async (req, res) => {
 
     try {
         const itemList = await getAllItems();
-        const nameArray = customerList.map(item => {
-            return item.name;
-        });
 
         const order = await createOrder({customerId, district, customerList, customerPrice}, CustomerOrder);
         await updateStatus({status: 'active', id: customerId, Model: Customer});
 
         let categories = [[],[],[],[],[],[],[]];
+        let batchOrderIds = [[],[],[],[],[],[],[]];
         const orders = await getAllActiveOrdersDistrict(district);
         if (orders.length == 3){
             for (let i of orders) {
                 for (let j in i.customerList){
-                    categories[j.category].push({...j, orderId: i._id});
+                    categories[catObject[j.category]].push(j);
+                    batchOrderIds[catObject[j.category]].push(i._id);
                 }
             }
+            
+            for (let i of batchOrderIds){
+                i = uniq(i);
+            }
 
-            for (let i of categories) {
-                if (i.length > 0) {
-                    // const employeeTargetPrice = await getTargetAndCustomerPrice({ itemList, nameArray: i});
-                    const batchOrderIds = Array();
-                    for (let j of i){
-                        batchOrderIds.push(j.orderId);
-                    }
-
-                    batchOrderIds = uniq(batchOrderIds);
-                    await createOrder({district, employeeTargetPrice, batchOrderIds}, EmployeeOrder);
+            categories = createBatch(categories, district);
+            for (let i = 0; i < categories.length; i++) {
+                if (categories[i].length > 0) {
+                    await createOrder({district, employeeList: batch, batchOrderIds: batchOrderIds[i]}, EmployeeOrder);
+                }
+            }
+            for (let batch of categories) {
+                if (batch.length > 0) {
+                    await createOrder({district, employeeList: batch, batchOrderIds}, EmployeeOrder);
                 }
             }
 
