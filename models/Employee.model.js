@@ -21,8 +21,7 @@ const optionsEnumType = {
 
 const EmployeeModel = new Schema({
     name: optionsString,
-    stars: optionsNumber,
-    currentOrder: optionsEnumType
+    status: optionsEnumType
 })
 
 module.exports = mongoose.model('Employee', EmployeeModel);

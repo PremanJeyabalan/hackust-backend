@@ -16,37 +16,41 @@ app.post('/order/create', async (req, res) => {
     const {customerId, district, customerList} = req.body;
 
     try {
-        const itemList = await getAllItems();
 
-        const order = await createOrder({customerId, district, customerList}, CustomerOrder);
-        await updateStatus({status: 'active', id: customerId, Model: Customer});
+        await createOrder({customerId, district, customerList}, CustomerOrder);
+        const order =  await updateStatus({status: 'active', id: customerId, Model: Customer});
 
         let categories = [[],[],[],[],[],[],[]];
         let batchOrderIds = [[],[],[],[],[],[],[]];
         const orders = await getAllActiveOrdersDistrict(district);
-        // console.log(orders);
+        console.log(orders);
+
         if (orders.length == 3){
-            for (let i of orders) {
-                for (let j of i.customerList){
-                    categories[catObject[j.category]].push(j);
-                    batchOrderIds[catObject[j.category]].push(i._id);
-                }
-            }
+
+            orders.map((order, i) => {
+                order = JSON.stringify(order)
+                order = JSON.parse(order);
+                order.customerList.forEach((item, j) => {
+                    categories[catObject[item.category]].push(item);
+                    batchOrderIds[catObject[item.category]].push(order._id);
+                })
+            })
+            
             
             for (let i of batchOrderIds){
                 i = uniq(i);
             }
 
             categories = createBatch(categories, district);
+
             for (let i = 0; i < categories.length; i++) {
                 if (categories[i].length > 0) {
-                    await createOrder({district, employeeList: batch, batchOrderIds: batchOrderIds[i]}, EmployeeOrder);
+                    await createOrder({district, employeeList: categories[i], batchOrderIds: batchOrderIds[i]}, EmployeeOrder);
                 }
             }
-            for (let batch of categories) {
-                if (batch.length > 0) {
-                    await createOrder({district, employeeList: batch, batchOrderIds}, EmployeeOrder);
-                }
+
+            for (let i of orders){
+                await updateStatus({Model: CustomerOrder, id:i._id, status: 'batched'})
             }
 
         }     
@@ -79,3 +83,5 @@ console.log("balls") //DO NOT DELETE
         }
     ] 
 */
+
+

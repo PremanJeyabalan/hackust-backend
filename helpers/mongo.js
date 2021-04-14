@@ -7,7 +7,7 @@ const Customer = require('../models/Customer.model');
 const Item = require('../models/Item.model');
 const Store = require('../models/Store.model');
 const FeedbackModel = require('../models/Feedback.model');
-const { result } = require('lodash');
+const { result, omit } = require('lodash');
 const { findOneAndUpdate } = require('../models/CustomerOrder.model');
 
 async function createOrder(data, Model) {
@@ -38,10 +38,11 @@ async function updateStatus({status, id, Model}) {
         await mongoose.connect(MongoURL, {
             useUnifiedTopology: true,   
             useNewUrlParser: true,
-            dbName: MongoDBName 
+            dbName: MongoDBName,
+            useFindAndModify: false
         })
 
-        const result = await Model.findByIdAndUpdate(id, {$set: {currentOrder: status}});
+        const result = await Model.findByIdAndUpdate(id, {status: status});
 
         await mongoose.connection.close();
 
@@ -61,9 +62,15 @@ async function createItems(employeeList) {
         const result = Array();
 
         for (let item of employeeList) {
-            const doc = Item({...item});
-            result.push(await doc.save().then(doc => {return doc})); 
+            item = JSON.stringify(item);
+            item = JSON.parse(item)
+            item = omit(item, ['_id'])
+            const doc = Item(item);
+            const value = await doc.save().then(doc => {return doc}); 
+            result.push(value)
         }
+
+        console.log(result)
 
         await mongoose.connection.close();
 
@@ -112,7 +119,7 @@ async function acceptOrder(employeeOrderId, employeeId) {
     }
 }
 
-async function getOrder(orderId) {
+async function getOrder(orderId, Model = CustomerOrder) {
     try {
         await mongoose.connect(MongoURL, {
             useUnifiedTopology: true,   
@@ -120,7 +127,7 @@ async function getOrder(orderId) {
             dbName: MongoDBName 
         })
 
-        const result = await CustomerOrder.findById(orderId);
+        const result = await Model.findById(orderId);
         
         await mongoose.connection.close();
 
@@ -138,8 +145,8 @@ async function updateEmployeeList(employeeList, employeeOrderId){
             dbName: MongoDBName 
         })
         
-        const result = await EmployeeOrder.findByIdAndUpdate(employeeOrderId, {$set: {employeeList}});
-
+        const result = await EmployeeOrder.findByIdAndUpdate(employeeOrderId,  {employeeList: employeeList});
+        console.log(result)
         await mongoose.connection.close();
 
         return result
@@ -277,7 +284,7 @@ async function updateEmployeeOrder(id, update){
             dbName: MongoDBName 
         })
 
-        const result = await EmployeeOrder.findByIdAndUpdate(id, {$set: update});
+        const result = await EmployeeOrder.findByIdAndUpdate(id, {...update});
 
         await mongoose.connection.close();
 

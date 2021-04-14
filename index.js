@@ -7,10 +7,12 @@ const feedback = require('./routes/routes.feedback');
 let app = Express();
 
 app.use(
-    BodyParser.urlencoded({
+    Express.urlencoded({
         extended: true
     })
 )
+
+app.use(Express.json());
 
 app.use('/accounts', accounts);
 app.use('/employee', employee);

@@ -29,6 +29,7 @@ const ItemModel = new Schema({
     amount: optionsNumber,
     type: optionsEnumType,
     price: optionsNumber,
+    district: optionsString,
     category: optionsCategoryType,
     employeeId: optionsString,
     storeId: optionsString
