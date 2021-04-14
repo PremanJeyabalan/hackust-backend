@@ -7,7 +7,8 @@ const EmployeeOrder = require('../models/EmployeeOrder.model');
 let app = Express();
 
 app.get('/order', async (req, res) => {
-    const { employeeId } = req.body;
+    const { employeeId } = req.query;
+    console.log(req.params)
     try {
         const order = await getAvailableOrder();
         console.log(order)
@@ -40,7 +41,7 @@ app.get('/order', async (req, res) => {
             error: e.message
         })
     }
-}) //READY FOR TEST
+})
 
 
 app.post('/add', async (req, res) => {

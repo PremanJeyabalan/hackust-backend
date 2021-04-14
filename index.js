@@ -1,5 +1,5 @@
 const Express = require('express');
-const BodyParser = require('body-parser');
+const cors = require('cors');
 const accounts = require('./routes/routes.accounts');
 const employee = require('./routes/routes.employee');
 const customer = require('./routes/routes.customer');
@@ -10,6 +10,10 @@ app.use(
     Express.urlencoded({
         extended: true
     })
+)
+
+app.use(
+    cors()
 )
 
 app.use(Express.json());

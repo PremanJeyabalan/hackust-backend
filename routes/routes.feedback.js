@@ -7,12 +7,10 @@ const Store = require('../models/Store.model');
 let app = Express();
 
 app.post('/create', async (req, res) => {
-    const { customerId, target, stars, type } = req.body;
+    const { feedback } = req.body;
 
     try {
-        const Model = (type === 'employee') ? Employee : (type === 'item') ? Item : Store;
-        const result = await createFeedback({customerId, target, stars});
-        const update = await updateStars({ id: target, Model})
+        const result = await createFeedback({feedback});
         
         res.status(200).json({
             success: true,

@@ -214,7 +214,7 @@ async function createStore({name, district}) {
     }
 }
 
-async function createFeedback({ customerId, target, stars }){
+async function createFeedback({ feedback }){
     try {
         await mongoose.connect(MongoURL, {
             useUnifiedTopology: true,   
@@ -222,8 +222,8 @@ async function createFeedback({ customerId, target, stars }){
             dbName: MongoDBName 
         })
 
-        const feedback = Feedback({customerId, target, stars });
-        const result = await feedback.save().then(doc => {return doc});
+        const data = Feedback({...feedback});
+        const result = await data.save().then(doc => {return doc});
 
         await mongoose.connection.close();
         return result;

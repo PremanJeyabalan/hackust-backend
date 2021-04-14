@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Stars = require('./Stars.models');
 const Schema = mongoose.Schema;
 
 const optionsString = {
@@ -13,8 +14,18 @@ const optionsNumber = {
 
 const FeedbackModel = Schema({
     customerId: optionsString,
-    target: optionsString,
-    stars: optionsNumber
+    customerOrderId: optionsString,
+    starObject: [Stars.schema]
 })
 
 module.exports = mongoose.model('Feedback', FeedbackModel);
+
+// employeeList: [
+//     {
+//         _id: "blah",
+//         itemId: "blah",
+//         amount: 15,
+//         type: 'discrete',
+//         dsitrict: "Mongkok",
+//     }
+// ]
