@@ -23,6 +23,7 @@ const CustomerOrderModel = new Schema({
     district: optionsString,
     employeeTargetPrice: {...optionsNumber, required: false},
     customerPrice: {...optionsNumber, required: false},
+    customerBatchIds: {type: [String], required: false},
     customerList: [new Schema({}, {strict: false})],
     status: optionsEnumType,
 }, {timestamps: true})

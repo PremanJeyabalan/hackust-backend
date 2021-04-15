@@ -14,7 +14,7 @@ const optionsNumber = {
 const optionsEnumType = {
     type: String,
     required: true,
-    enum: ['discrete', 'kg', 'g'],
+    enum: ['discrete', 'kg'],
     default: 'discrete'
 }
 

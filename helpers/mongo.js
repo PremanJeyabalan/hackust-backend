@@ -276,7 +276,7 @@ async function getAllActiveOrdersDistrict(district){
     }
 }
 
-async function updateEmployeeOrder(id, update){
+async function updateEmployeeOrder(id, update, Model = EmployeeOrder){
     try {
         await mongoose.connect(MongoURL, {
             useUnifiedTopology: true,   
@@ -284,7 +284,7 @@ async function updateEmployeeOrder(id, update){
             dbName: MongoDBName 
         })
 
-        const result = await EmployeeOrder.findByIdAndUpdate(id, {...update});
+        const result = await Model.findByIdAndUpdate(id, {...update});
 
         await mongoose.connection.close();
 
@@ -294,7 +294,7 @@ async function updateEmployeeOrder(id, update){
     }
 }
 
-async function solveCustomerOrder(batchOrderId){
+async function solveCustomerOrder(batchId){
     try {
         await mongoose.connect(MongoURL, {
             useUnifiedTopology: true,   
@@ -302,22 +302,22 @@ async function solveCustomerOrder(batchOrderId){
             dbName: MongoDBName 
         })
 
-        const result = await EmployeeOrder.find({batchOrderId});
-        let status = true;
+        const result = await CustomerOrder.find({customerBatchIds: batchId});
 
         for (order of result){
-            if (order.status !== 'solved'){
-                status = false;
-                break;
+            let status = true;
+            for (let i = 0; i < order.customerBatchIds.length; i++){
+                const data = await getOrder(order.customerBatchIds[i], EmployeeOrder);
+                if (data.status !== 'solved'){
+                    status = false;
+                }
+            }
+            if (status) {
+                await updateStatus({status: 'solved', id: order._id, Model: CustomerOrder});
+                await updateStatus({status: 'inactive', id: order._id, Model: Customer});
             }
         }
 
-        if (status) {
-            await updateStatus({status: 'solved', id: batchOrderId, Model: CustomerOrder});
-            const order = await getOrder(batchOrderId);
-            await updateStatus({status: 'inactive', id: order.customerId, Model: Customer});
-        }
-
         await mongoose.connection.close();
 
         return result
@@ -326,7 +326,24 @@ async function solveCustomerOrder(batchOrderId){
     }
 }
 
+async function emptyCollection(Model) {
+    try {
+        await mongoose.connect(MongoURL, {
+            useUnifiedTopology: true,   
+            useNewUrlParser: true,
+            dbName: MongoDBName 
+        })
 
+        const result = await Model.deleteMany({});
+
+        await mongoose.connection.close();
+
+        return result;
+
+    } catch (e) {
+        throw e
+    }
+}
 
 module.exports = {
     createOrder,
@@ -344,4 +361,5 @@ module.exports = {
     getAllActiveOrdersDistrict,
     updateEmployeeOrder,
     solveCustomerOrder,
+    emptyCollection,
 }

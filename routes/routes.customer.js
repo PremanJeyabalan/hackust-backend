@@ -1,6 +1,6 @@
 const Express = require('express');
 const bodyParser = require('body-parser');
-const { createOrder, updateStatus, getAllItems, getAllActiveOrdersDistrict } = require('../helpers/mongo');
+const { createOrder, updateStatus, getAllItems, getAllActiveOrdersDistrict, updateEmployeeOrder } = require('../helpers/mongo');
 const { getTargetAndCustomerPrice } = require('../helpers/microservice');
 const Customer = require('../models/Customer.model');
 const CustomerOrder = require('../models/CustomerOrder.model');
@@ -16,12 +16,13 @@ app.post('/order/create', async (req, res) => {
     const {customerId, district, customerList} = req.body;
 
     try {
-
+        // const customerPrice = await cheeseeeeeeeeeeeeeeeeeeee()
         await createOrder({customerId, district, customerList}, CustomerOrder);
         const order =  await updateStatus({status: 'active', id: customerId, Model: Customer});
 
         let categories = [[],[],[],[],[],[],[]];
         let batchOrderIds = [[],[],[],[],[],[],[]];
+        let customerBatchIds = [[],[],[]]
         const orders = await getAllActiveOrdersDistrict(district);
         console.log(orders);
 
@@ -35,6 +36,7 @@ app.post('/order/create', async (req, res) => {
                     batchOrderIds[catObject[item.category]].push(order._id);
                 })
             })
+
             
             
             for (let i of batchOrderIds){
@@ -45,8 +47,20 @@ app.post('/order/create', async (req, res) => {
 
             for (let i = 0; i < categories.length; i++) {
                 if (categories[i].length > 0) {
-                    await createOrder({district, employeeList: categories[i], batchOrderIds: batchOrderIds[i]}, EmployeeOrder);
+                    const result = await createOrder({district, employeeList: categories[i], batchOrderIds: batchOrderIds[i]}, EmployeeOrder);
+                    batchOrderIds[i].map((batch, index) => {
+                        for (let j = 0; j < 3; j++){
+                            if (batch.includes(orders[j]._id)){
+                                customerBatchIds[j].push(result._id)
+                            }
+                        }
+                        
+                    })
                 }
+            }
+
+            for (let i = 0; i < 3; i++){
+                await updateEmployeeOrder(orders[i]._id, {customerBatchIds: customerBatchIds[i]}, CustomerOrder);
             }
 
             for (let i of orders){

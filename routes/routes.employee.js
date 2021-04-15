@@ -8,11 +8,10 @@ let app = Express();
 
 app.get('/order', async (req, res) => {
     const { employeeId } = req.query;
-    console.log(req.params)
     try {
         const order = await getAvailableOrder();
         console.log(order)
-        // const employeeTargetPrice = await cheeseeeeeeeeeeeeeeeeeeeeeee()
+        // const targetPrice = await cheeseeeeeeeeeeeeeeeeeeeeeee()
         await updateEmployeeOrder(order[0]._id, {employeeId: employeeId, status: 'accepted'});
         await updateStatus({status: 'busy', id: employeeId, Model: Employee});
 
@@ -65,17 +64,16 @@ app.post('/add', async (req, res) => {
 
 app.post('/solve', async (req, res) => {
     const { employeeOrderId } = req.body;
-
+    console.log(req.body)
     try {
         const order = await getOrder(employeeOrderId, EmployeeOrder);
         await updateStatus({Model: EmployeeOrder, id: employeeOrderId, status: 'solved'});
-        for (let id of order.batchOrderIds){
-            await solveCustomerOrder(id);
-        }
+
+
+        await solveCustomerOrder(order._id);
         
         const result = await updateStatus({Model: Employee, id: order.employeeId, status: 'free'});
-        // let temp = JSON.stringify(order)
-        // temp = JSON.parse(order)
+        
         await createItems(order.employeeList);
 
 
