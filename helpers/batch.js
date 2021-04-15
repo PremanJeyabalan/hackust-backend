@@ -22,7 +22,8 @@ function createBatch(categories, district) {
                 amount: 0,
                 type: 'discrete',
                 district,
-                category: CATOBJECT[i]
+                category: CATOBJECT[i],
+                targetPrice : 0
             }
         })
 
@@ -34,7 +35,8 @@ function createBatch(categories, district) {
                 if (combinedItems[i][uniqueCounter[i][order.itemId]].amount === 0){
                     combinedItems[i][uniqueCounter[i][order.itemId]].type = order.type;
                 } 
-                
+                console.log(order.targetPrice)
+                combinedItems[i][uniqueCounter[i][order.itemId]].targetPrice += order.targetPrice;
                 combinedItems[i][uniqueCounter[i][order.itemId]].amount += order.amount;
             }     
         })

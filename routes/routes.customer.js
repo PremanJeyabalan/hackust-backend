@@ -1,7 +1,7 @@
 const Express = require('express');
 const bodyParser = require('body-parser');
 const { createOrder, updateStatus, getAllItems, getAllActiveOrdersDistrict, updateEmployeeOrder } = require('../helpers/mongo');
-const { getTargetAndCustomerPrice } = require('../helpers/microservice');
+const { getCustomerPrice } = require('../helpers/microservice');
 const Customer = require('../models/Customer.model');
 const CustomerOrder = require('../models/CustomerOrder.model');
 const EmployeeOrder = require('../models/EmployeeOrder.model');
@@ -16,7 +16,12 @@ app.post('/order/create', async (req, res) => {
     const {customerId, district, customerList} = req.body;
 
     try {
-        // const customerPrice = await cheeseeeeeeeeeeeeeeeeeeee()
+
+        // for (item of customerList) {
+        //     const result = await getCustomerPrice(item);
+        //     item = result;
+        // }
+
         await createOrder({customerId, district, customerList}, CustomerOrder);
         const order =  await updateStatus({status: 'active', id: customerId, Model: Customer});
 
@@ -27,7 +32,6 @@ app.post('/order/create', async (req, res) => {
         console.log(orders);
 
         if (orders.length == 3){
-
             orders.map((order, i) => {
                 order = JSON.stringify(order)
                 order = JSON.parse(order);

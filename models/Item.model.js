@@ -32,7 +32,8 @@ const ItemModel = new Schema({
     district: optionsString,
     category: optionsCategoryType,
     employeeId: optionsString,
-    storeId: optionsString
+    storeId: optionsString,
+    targetPrice: optionsNumber
 }, {timestamps: true})
 
 

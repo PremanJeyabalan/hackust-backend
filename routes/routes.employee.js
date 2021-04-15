@@ -11,10 +11,6 @@ app.get('/order', async (req, res) => {
     const { employeeId } = req.query;
     try {
         const order = await getAvailableOrder();
-        console.log(order)
-        const targetPrice = await axios.post('', {
-            
-        })
         await updateEmployeeOrder(order[0]._id, {employeeId: employeeId, status: 'accepted'});
         await updateStatus({status: 'busy', id: employeeId, Model: Employee});
 
