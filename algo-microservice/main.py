@@ -4,11 +4,13 @@ from flask_cors import CORS
 import target_store
 import logging
 import average_market_price
+import onnx
+import argparse
 ######################
 log = logging.getLogger('test')
 log.setLevel(logging.DEBUG)
 
-log.warn('warn')
+log.warning('warn')
 log.debug('debug')
 
 log.root.setLevel(logging.DEBUG)
@@ -38,7 +40,7 @@ parser = reqparse.RequestParser()
 # //initialise program 
 target_store.init_program()
 
-parser.add_argument('_id', location="form")
+parser.add_argument('employeeId', location="form")
 parser.add_argument('itemId', type=int, location="form")
 parser.add_argument('amount',type=int, location="form")
 parser.add_argument('type', location="form")
@@ -55,15 +57,26 @@ class Algorithm(Resource):
         print(test)
         return test, 200
     def post(self):
-        args = parser.parse_args()
+        a = parser.parse_args()
+        # args = parser.parse_args()
         total = []
-        template = [args["_id"], args["itemId"], args["amount"], args["type"], args["district"], args["category"]]
+        template = [a["employeeId"], a["itemId"], a["amount"], a["type"], a["district"], a["category"]]
         total.append(template)
+        print(total)
         values=target_store.get_target_and_store(total)
         print(values)
-        return values,200
+        return values[0],200
+def main(*args):
+    import argparse
 
-    
+    parser = argparse.ArgumentParser(description='MyApp')
+    # parser.add_argument('-o','--output',dest='output', help='Output file image', default='output.png')
+    # parser.add_argument('files', metavar='IMAGE', nargs='+', help='Input image file(s)')
+
+    a = parser.parse_args()
+    print(a)
+    return a
+
 
 # @app.route("/", methods=['POST'])
 # def get_price():
@@ -73,4 +86,5 @@ class Algorithm(Resource):
 api.add_resource(Algorithm, '/test')
 
 if __name__ == '__main__':
+    main()
     app.run(debug=True) 
