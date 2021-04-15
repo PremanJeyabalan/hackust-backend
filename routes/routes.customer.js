@@ -7,22 +7,19 @@ const CustomerOrder = require('../models/CustomerOrder.model');
 const EmployeeOrder = require('../models/EmployeeOrder.model');
 const { uniq } = require('lodash');
 const { createBatch } = require('../helpers/batch');
+const ItemModel = require('../models/Item.model');
 let app = Express.Router();
 const catObject = {fruit : 0, veg: 1, poul: 2, dairy: 3, seafood: 4, cereals: 5, beverages: 6 } ;
 
 app.use(Express.json());
+
 
 app.post('/order/create', async (req, res) => {
     const {customerId, district, customerList} = req.body;
 
     try {
 
-        // for (item of customerList) {
-        //     const result = await getCustomerPrice(item);
-        //     item = result;
-        // }
-
-        await createOrder({customerId, district, customerList}, CustomerOrder);
+        const result = await createOrder({customerId, district, customerList}, CustomerOrder);
         const order =  await updateStatus({status: 'active', id: customerId, Model: Customer});
 
         let categories = [[],[],[],[],[],[],[]];
@@ -75,7 +72,7 @@ app.post('/order/create', async (req, res) => {
 
         res.status(200).json({
             success: true,
-            data: order
+            data: data
         })
 
     } catch (e) {

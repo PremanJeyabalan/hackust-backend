@@ -26,6 +26,7 @@ const optionsCategoryType = {
 
 const ItemModel = new Schema({
     itemId: optionsString,
+    itemName: optionsString,
     amount: optionsNumber,
     type: optionsEnumType,
     price: optionsNumber,

@@ -15,7 +15,9 @@ async function getTargetPrice(order) {
 
 async function getCustomerPrice(){
     try {
-        
+        const response = await axios.get(`${algoMicroserviceURL}/test`);
+        console.log(response.data)
+        return response.data;
     } catch (e) {
         throw e;
     }

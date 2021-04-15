@@ -11,6 +11,7 @@ const foodType = ["fruit", "veg", "poul"];
 const customerList = foodName.map((value, index) => {
     return({
         itemId : index,
+        itemName: foodName[index],
         amount : 5,
         type : "discrete",
         category : foodType[index],
@@ -26,11 +27,11 @@ const full = {
 
 customerIds = ['607734506680d272b8f69e83', '6077345a6680d272b8f69e84', '6077345e6680d272b8f69e85'];
 const initDB = async () => {
-    // await emptyCollection(CustomerOrderModel);
-    // await emptyCollection(EmployeeOrderModel);
-    let i = 2 ;
+    await emptyCollection(CustomerOrderModel);
+    await emptyCollection(EmployeeOrderModel);
+    let i = 0 ;
     setTimeout(() => {
-        axios.post("http://localhost:5000/customer/order/create", {...full, customerId: customerIds[i++]}).then(value => console.log(value)).catch(err => console.log(err));
+        axios.post("http://localhost:8000/customer/order/create", {...full, customerId: customerIds[i++]}).then(value => console.log(value)).catch(err => console.log(err));
     }, 1)
 }
 
