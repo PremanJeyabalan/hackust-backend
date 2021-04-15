@@ -64,8 +64,10 @@ class Algorithm(Resource):
         total.append(template)
         print(total)
         values=target_store.get_target_and_store(total)
-        print(values)
-        return values[0],200
+        titles = ["employeeId","itemId","amount", "type", "district", "category", "targetPrice", "storeId"]
+        valuesDict = dict(zip(titles, values[0]))    
+        print(valuesDict)
+        return valuesDict,200
 def main(*args):
     import argparse
 
@@ -88,3 +90,4 @@ api.add_resource(Algorithm, '/test')
 if __name__ == '__main__':
     main()
     app.run(debug=True) 
+
