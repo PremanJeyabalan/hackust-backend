@@ -240,4 +240,5 @@ def get_target_and_store(request):
     ori_request[i].append(prediction[0])
   # print("ori_request : ", ori_request)
   return ori_request
+# init_program()
 # print(get_target_and_store(request))
