@@ -42,7 +42,7 @@ async function updateStatus({status, id, Model}) {
             useFindAndModify: false
         })
 
-        const result = await Model.findByIdAndUpdate(id, {status: status});
+        const result = await Model.findByIdAndUpdate(id, {status: status},  {new: true});
 
         await mongoose.connection.close();
 
@@ -108,7 +108,7 @@ async function acceptOrder(employeeOrderId, employeeId) {
             dbName: MongoDBName 
         })
 
-        const result = await EmployeeOrder.findByIdAndUpdate(employeeOrderId, {$set: {employeeId, status: 'accepted'}});
+        const result = await EmployeeOrder.findByIdAndUpdate(employeeOrderId, {$set: {employeeId, status: 'accepted'}},  {new: true});
 
         await mongoose.connection.close();
 
@@ -145,7 +145,7 @@ async function updateEmployeeList(employeeList, employeeOrderId){
             dbName: MongoDBName 
         })
         
-        const result = await EmployeeOrder.findByIdAndUpdate(employeeOrderId,  {employeeList: employeeList});
+        const result = await EmployeeOrder.findByIdAndUpdate(employeeOrderId,  {employeeList: employeeList},  {new: true});
         console.log(result)
         await mongoose.connection.close();
 
@@ -249,7 +249,7 @@ async function updateStars({ id, Model }){
 
         score = score / count
 
-        const result = await Model.findByIdAndUpdate(id, {$set: {stars: score}});
+        const result = await Model.findByIdAndUpdate(id, {$set: {stars: score}},  {new: true});
 
         await mongoose.connection.close();
         return result;
@@ -284,7 +284,7 @@ async function updateEmployeeOrder(id, update, Model = EmployeeOrder){
             dbName: MongoDBName 
         })
 
-        const result = await Model.findByIdAndUpdate(id, {...update});
+        const result = await Model.findByIdAndUpdate(id, {...update},  {new: true});
 
         await mongoose.connection.close();
 

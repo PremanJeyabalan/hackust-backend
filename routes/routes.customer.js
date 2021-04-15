@@ -1,23 +1,25 @@
 const Express = require('express');
 const bodyParser = require('body-parser');
 const { createOrder, updateStatus, getAllItems, getAllActiveOrdersDistrict, updateEmployeeOrder } = require('../helpers/mongo');
-const { getTargetAndCustomerPrice } = require('../helpers/microservice');
+const { getCustomerPrice } = require('../helpers/microservice');
 const Customer = require('../models/Customer.model');
 const CustomerOrder = require('../models/CustomerOrder.model');
 const EmployeeOrder = require('../models/EmployeeOrder.model');
 const { uniq } = require('lodash');
 const { createBatch } = require('../helpers/batch');
+const ItemModel = require('../models/Item.model');
 let app = Express.Router();
 const catObject = {fruit : 0, veg: 1, poul: 2, dairy: 3, seafood: 4, cereals: 5, beverages: 6 } ;
 
 app.use(Express.json());
 
+
 app.post('/order/create', async (req, res) => {
     const {customerId, district, customerList} = req.body;
 
     try {
-        // const customerPrice = await cheeseeeeeeeeeeeeeeeeeeee()
-        await createOrder({customerId, district, customerList}, CustomerOrder);
+
+        const result = await createOrder({customerId, district, customerList}, CustomerOrder);
         const order =  await updateStatus({status: 'active', id: customerId, Model: Customer});
 
         let categories = [[],[],[],[],[],[],[]];
@@ -27,7 +29,6 @@ app.post('/order/create', async (req, res) => {
         console.log(orders);
 
         if (orders.length == 3){
-
             orders.map((order, i) => {
                 order = JSON.stringify(order)
                 order = JSON.parse(order);
@@ -71,7 +72,7 @@ app.post('/order/create', async (req, res) => {
 
         res.status(200).json({
             success: true,
-            data: order
+            data: data
         })
 
     } catch (e) {

@@ -4,7 +4,7 @@ from flask_cors import CORS
 import target_store
 import logging
 import average_market_price
-import onnx
+# import onnx
 import argparse
 ######################
 log = logging.getLogger('test')

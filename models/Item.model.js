@@ -26,13 +26,15 @@ const optionsCategoryType = {
 
 const ItemModel = new Schema({
     itemId: optionsString,
+    itemName: optionsString,
     amount: optionsNumber,
     type: optionsEnumType,
     price: optionsNumber,
     district: optionsString,
     category: optionsCategoryType,
     employeeId: optionsString,
-    storeId: optionsString
+    storeId: optionsString,
+    targetPrice: optionsNumber
 }, {timestamps: true})
 
 
