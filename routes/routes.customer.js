@@ -46,6 +46,8 @@ app.post('/order/create', async (req, res) => {
 
             categories = createBatch(categories, district);
 
+            console.log(categories);
+
             for (let i = 0; i < categories.length; i++) {
                 if (categories[i].length > 0) {
                     const result = await createOrder({district, employeeList: categories[i], batchOrderIds: batchOrderIds[i]}, EmployeeOrder);
@@ -72,7 +74,7 @@ app.post('/order/create', async (req, res) => {
 
         res.status(200).json({
             success: true,
-            data: data
+            data: result
         })
 
     } catch (e) {

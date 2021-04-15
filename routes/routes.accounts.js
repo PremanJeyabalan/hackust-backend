@@ -6,10 +6,9 @@ let app = Express.Router();
 
 app.post('/create/employee', async (req, res) => {
     console.log(req.body);
-    const {name} = req.body;
 
     try {
-        const person = await createPerson(name, Employee);
+        const person = await createPerson(req.body, Employee);
 
         res.status(200).json({
             success: true,
@@ -27,7 +26,7 @@ app.post('/create/customer', async (req, res) => {
     const {name} = req.body;
 
     try {
-        const person = await createPerson(name, Customer);
+        const person = await createPerson({name: name}, Customer);
 
         res.status(200).json({
             success: true,

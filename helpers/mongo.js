@@ -173,7 +173,7 @@ async function getAvailableOrder() {
     }
 }
 
-async function createPerson(name, Model) {
+async function createPerson(data, Model) {
     try {
         await mongoose.connect(MongoURL, {
             useUnifiedTopology: true,   
@@ -181,9 +181,9 @@ async function createPerson(name, Model) {
             dbName: MongoDBName 
         })
 
-        console.log(name, "is here!");
+        console.log(data, "is here!");
 
-        const person = Model({name : name});
+        const person = Model({name: data.name, _id: data._id });
         console.log("model made")
         const result = await person.save().then(doc => {return doc}).catch(err => console.log(err));
 

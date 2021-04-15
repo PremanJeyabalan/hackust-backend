@@ -1,6 +1,7 @@
 const Express = require('express');
 const axios = require('axios')
 const { createOrder, updateStatus, createItems, getAllItems, acceptOrder, getOrder, getAvailableOrder, updateEmployeeOrder, updateEmployeeList, solveCustomerOrder } = require('../helpers/mongo');
+const { getTargetPrice } = require  ('../helpers/microservice');
 const Customer = require('../models/Customer.model');
 const Employee = require('../models/Employee.model');
 const CustomerOrder = require('../models/CustomerOrder.model');
@@ -11,7 +12,23 @@ app.get('/order', async (req, res) => {
     const { employeeId } = req.query;
     try {
         const order = await getAvailableOrder();
-        await updateEmployeeOrder(order[0]._id, {employeeId: employeeId});
+
+        const employeeList = []
+
+        for (item of order[0].employeeList){
+            item = JSON.stringify(item);
+            item = JSON.parse(item);
+            item.employeeId = employeeId;
+            const data = await getTargetPrice(item);
+            item.targetPrice = data.targetPrice;
+            item.suggestedStoreId = data.storeId;
+            employeeList.push(item)
+        }
+
+        console.log(order[0].employeeList, 'hiiiiiiiiiiiiiii')
+
+        const result = await updateEmployeeOrder(order[0]._id, {employeeId: employeeId, employeeList: employeeList, status: 'accepted'}); //status acceopted
+
         await updateStatus({status: 'busy', id: employeeId, Model: Employee});
 
         for (each of order){
@@ -24,9 +41,6 @@ app.get('/order', async (req, res) => {
                 await updateStatus({Model: Customer, id: customer.customerId, status: 'accepted'});
             }
         }
-        
-
-        const result = await getOrder(order[0]._id, EmployeeOrder);
 
         res.status(200).json({
             success: true,

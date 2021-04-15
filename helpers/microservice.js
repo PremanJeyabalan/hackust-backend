@@ -1,11 +1,14 @@
 
 const axios = require('axios');
 const { algoMicroserviceURL } = require('../config');
+const querystring = require('querystring');
 
 async function getTargetPrice(order) {
     try {
-        console.log(order);
-        const response = await axios.post(`${algoMicroserviceURL}/test`, {...order});
+        console.log({...order});
+        const response = await axios.post(`${algoMicroserviceURL}/test`, querystring.stringify({...order}), {headers: { 
+            "Content-Type": "application/x-www-form-urlencoded"
+        }});
         console.log(response.data);
         return response.data;
     } catch (e) {
@@ -25,4 +28,5 @@ async function getCustomerPrice(){
 
 module.exports = {
     getCustomerPrice,
+    getTargetPrice
 }

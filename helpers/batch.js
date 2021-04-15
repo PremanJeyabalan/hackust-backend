@@ -1,5 +1,5 @@
 const { uniq } = require("lodash")
-const CATOBJECT = {fruit : 0, veg: 1, poul: 2, dairy: 3, seafood: 4, cereals: 5, beverages: 6 } ;
+const CATOBJECT = ['fruit', 'veg', 'poul', 'dairy', 'seafood', 'cereals', 'beverages' ]
 
 function createBatch(categories, district) {
     const uniqueItems = [[],[],[],[],[],[],[]];
@@ -23,7 +23,6 @@ function createBatch(categories, district) {
                 type: 'discrete',
                 district,
                 category: CATOBJECT[i],
-                targetPrice : 0
             }
         })
 
@@ -35,8 +34,6 @@ function createBatch(categories, district) {
                 if (combinedItems[i][uniqueCounter[i][order.itemId]].amount === 0){
                     combinedItems[i][uniqueCounter[i][order.itemId]].type = order.type;
                 } 
-                console.log(order.targetPrice)
-                combinedItems[i][uniqueCounter[i][order.itemId]].targetPrice += order.targetPrice;
                 combinedItems[i][uniqueCounter[i][order.itemId]].amount += order.amount;
             }     
         })
