@@ -1,4 +1,5 @@
 const Express = require('express');
+const axios = require('axios')
 const { createOrder, updateStatus, createItems, getAllItems, acceptOrder, getOrder, getAvailableOrder, updateEmployeeOrder, updateEmployeeList, solveCustomerOrder } = require('../helpers/mongo');
 const Customer = require('../models/Customer.model');
 const Employee = require('../models/Employee.model');
@@ -11,7 +12,9 @@ app.get('/order', async (req, res) => {
     try {
         const order = await getAvailableOrder();
         console.log(order)
-        // const targetPrice = await cheeseeeeeeeeeeeeeeeeeeeeeee()
+        const targetPrice = await axios.post('', {
+            
+        })
         await updateEmployeeOrder(order[0]._id, {employeeId: employeeId, status: 'accepted'});
         await updateStatus({status: 'busy', id: employeeId, Model: Employee});
 

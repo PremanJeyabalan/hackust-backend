@@ -3,6 +3,7 @@ from flask_restful import reqparse, abort, Api, Resource
 from flask_cors import CORS
 import target_store
 import logging
+import average_market_price
 ######################
 log = logging.getLogger('test')
 log.setLevel(logging.DEBUG)
@@ -44,6 +45,15 @@ parser.add_argument('type', location="form")
 parser.add_argument('district', location="form")
 parser.add_argument('category', location="form")
 class Algorithm(Resource):
+
+    def get(self):
+        # for name in args["name"]:
+        # customer_price, employee_target = test.algorithm(name)
+        # temp = {'name' : name,'customerPrice': customer_price, 'targetPrice': employee_target}
+        # data.append(temp)
+        test = average_market_price.call()
+        print(test)
+        return test, 200
     def post(self):
         args = parser.parse_args()
         total = []
@@ -51,12 +61,9 @@ class Algorithm(Resource):
         total.append(template)
         values=target_store.get_target_and_store(total)
         print(values)
+        return values,200
 
-        # for name in args["name"]:
-            # customer_price, employee_target = test.algorithm(name)
-            # temp = {'name' : name,'customerPrice': customer_price, 'targetPrice': employee_target}
-            # data.append(temp)
-        return values, 200
+    
 
 # @app.route("/", methods=['POST'])
 # def get_price():
